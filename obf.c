@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/syscall.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
+__attribute__((always_inline))
 long syscall(long syscall_number, long arg1, long arg2, long arg3, long arg4,
     long arg5)
 {
@@ -38,9 +41,13 @@ long syscall4(long syscall_number, long arg1, long arg2, long arg3, long arg4)
     return syscall(syscall_number, arg1, arg2, arg3, arg4, 0);
 }
 
+#define write(a, b, c) syscall3(SYS_write, a, (long) b, c)
+#define open(a, b) syscall2(SYS_open, (long) a, b)
+#define lseek(a, b, c) syscall3(SYS_lseek, a, b, c)
+#define close(a) syscall1(SYS_close, a)
+
 int Main()
 {
-    syscall3(SYS_write, 2, (long) "abc\n", 4);
     syscall0(SYS_exit);
     return 0;
 }
