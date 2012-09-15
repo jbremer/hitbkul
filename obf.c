@@ -4,8 +4,8 @@
 #include <string.h>
 #include <sys/syscall.h>
 
-long int syscall(long int syscall_number, long int arg1, long int arg2,
-    long int arg3, long int arg4, long int arg5)
+long syscall(long syscall_number, long arg1, long arg2, long arg3, long arg4,
+    long arg5)
 {
     long ret = 0;
     __asm__("int $0x80" : "=a" (ret) : "a" (syscall_number),
@@ -13,9 +13,36 @@ long int syscall(long int syscall_number, long int arg1, long int arg2,
     return ret;
 }
 
-int main(int argc, char *argv[])
+long syscall0(long syscall_number)
 {
-    printf("a: %ld\n", syscall(SYS_gettid, 0, 0, 0, 0, 0));
+    return syscall(syscall_number, 0, 0, 0, 0, 0);
+}
+
+long syscall1(long syscall_number, long arg1)
+{
+    return syscall(syscall_number, arg1, 0, 0, 0, 0);
+}
+
+long syscall2(long syscall_number, long arg1, long arg2)
+{
+    return syscall(syscall_number, arg1, arg2, 0, 0, 0);
+}
+
+long syscall3(long syscall_number, long arg1, long arg2, long arg3)
+{
+    return syscall(syscall_number, arg1, arg2, arg3, 0, 0);
+}
+
+long syscall4(long syscall_number, long arg1, long arg2, long arg3, long arg4)
+{
+    return syscall(syscall_number, arg1, arg2, arg3, arg4, 0);
+}
+
+int Main()
+{
+    syscall3(SYS_write, 2, (long) "abc\n", 4);
+    syscall0(SYS_exit);
+    return 0;
 }
 
 
