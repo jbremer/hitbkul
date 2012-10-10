@@ -10,6 +10,7 @@
 #include <winsock2.h>
 #define close closesocket
 #define fork() 0
+#define sleep(x) Sleep(x * 1000)
 
 int fd;
 
@@ -196,12 +197,19 @@ void silicone()
 "                           `*^^~           - *´\r\n");
 }
 
-char wonder_bra[512];
+typedef struct {
+    int (*callback)(const char *);
+    char data[128];
+} info_t;
+
+char *wonder_bra;
+info_t *info;
 
 void wonder()
 {
     xyz("Name of a Company that sells Wonder Bra's?\r\n> ");
-    strcpy(wonder_bra, line());
+    free(wonder_bra);
+    wonder_bra = strdup(line());
 }
 
 void d_cups()
@@ -263,6 +271,29 @@ void android()
 "* g o a t s e x * g o a t s e x * g o a t s e x *\r\n");
 }
 
+void cold()
+{
+    xyz(
+"The SCADA Boob Controller does not have available ASCII Art for this\r\n"
+"particular type of breasts.\r\n");
+
+    info->callback = (int(*)(const char *)) &cold;
+    strcpy(info->data, "Cold Breasts");
+}
+
+void pornstar()
+{
+    info->callback(info->data);
+    xyz("Pornstar Breasts vs %s\r\nCalculating", info->data);
+
+    for (int i = 0; i < 5; i++) {
+        sleep(1);
+        xyz(".");
+    }
+
+    xyz("\r\nCalculation failed..\r\n");
+}
+
 void perfect()
 {
     xyz(
@@ -293,6 +324,15 @@ void perfect()
 "              |  _ _\\__         /                      \r\n"
 "              \\      _\\).       |                      \r\n"
 "cjr           |       ||        |                      \r\n");
+}
+
+void lopsided()
+{
+    xyz("Nothing to see here.");
+
+    if(!strcmp(info->data, "Cold Breasts")) {
+        free(info);
+    }
 }
 
 void big()
@@ -334,6 +374,12 @@ void big()
 "              `'''L-\\_Yl-'                                      \r\n");
 }
 
+void high()
+{
+    system("/bin/ls -al /tmp/boobs | /bin/grep nipple | /bin/grep high");
+    strcpy((char *) info, line());
+}
+
 struct {
     const char *name;
     const char *cmd;
@@ -341,21 +387,27 @@ struct {
 } breasts[] = {
     {"Perfect Breasts", "(o)(o)", &perfect},
     {"Fake Silicone Breasts", "( + )( + )", &silicone},
-    {"High Nipple Breasts", "(*)(*)"},
+    {"High Nipple Breasts", "(*)(*)", &high},
     {"Big Nipple Breasts", "(@)(@)", &big},
     {"A Cups", "oo", &a_cups},
     {"D Cups", "{ O }{ O }", &d_cups},
     {"Wonder Bra Breasts", "(oYo)", &wonder},
-    {"Cold Breasts", "( ^ )( ^ )"},
+    {"Cold Breasts", "( ^ )( ^ )", &cold},
     {"Lopsided Breasts", "(o)(O)"},
     {"Pierced Breasts", "(Q)(Q)"},
     {"Hanging Tassels Breasts", "(p)(p)"},
     {"Android Breasts", "|o||o|", &android},
-    {"Porn Star Breasts", "($)($)"},
+    {"Porn Star Breasts", "($)($)", &pornstar},
 };
 
 void boobz0r()
 {
+    wonder_bra = strdup("SCADA Auxiliary Wonder Bra Company Name");
+
+    info = (info_t *) malloc(sizeof(info_t));
+    info->callback = &lopsided;
+    strcpy(info->data, "Lopsided Breasts");
+
     xyz(
 "Welcome to the SCADA Boob Controller TM (C) (R)\r\n"
 "You are now using the State-of-the-Art Boob Controller Input Validator TM.\r\n"
@@ -372,6 +424,12 @@ void boobz0r()
 "listed here: http://www.freshsupercool.com/2009/04/04/ascii-boobs/\r\n"
             );
             continue;
+        }
+
+        if(!strcmp(x, "info")) {
+            xyz(
+"SCADA Boob Controller Information Gathering Unit TM.\r\n"
+"Wonder Bra Company: %s\r\n", wonder_bra);
         }
 
         int found = 0;
