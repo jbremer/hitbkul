@@ -1,16 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-/*
+#include <stdarg.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-*/
-#include <winsock2.h>
-#define close closesocket
-#define fork() 0
-#define sleep(x) Sleep(x * 1000)
 
 int fd;
 
@@ -19,11 +14,9 @@ void xyz(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     int len = vsnprintf(NULL, 0, fmt, args);
-    char *s = (char *) malloc(len + 1);
-    if(s != NULL) {
-        vsprintf(s, fmt, args);
-        send(fd, s, len, 0);
-    }
+    char s[len+1];
+    vsprintf(s, fmt, args);
+    send(fd, s, len, 0);
     va_end(args);
 }
 
@@ -208,7 +201,6 @@ info_t *info;
 void wonder()
 {
     xyz("Name of a Company that sells Wonder Bra's?\r\n> ");
-    free(wonder_bra);
     wonder_bra = strdup(line());
 }
 
@@ -253,7 +245,7 @@ void android()
 "e \\       | /       /  \\\\\\   --__ \\\\       :    e\r\n"
 "x  \\      \\/   _--~~          ~--__| \\     |    x  \r\n"
 "*   \\      \\_-~                    ~-_\\    |    *\r\n"
-"g    \\_     \        _.--------.______\\|   |    g\r\n"
+"g    \\_     \\        _.--------.______\\|   |    g\r\n"
 "o      \\     \\______// _ ___ _ (_(__>  \\   |    o\r\n"
 "a       \\   .  C ___)  ______ (_(____>  |  /    a\r\n"
 "t       /\\ |   C ____)/      \\ (_____>  |_/     t\r\n"
@@ -261,8 +253,6 @@ void android()
 "e     |   (   _C_____)\\______/  // _/ /     \\   e\r\n"
 "x     |    \\  |__   \\_________// (__/       |  x\r\n"
 "*    | \\    \\____)   `----   --'             |  *\r\n"
-"g    |  \\_          ___\\       /_          _/ | g\r\n"
-"o   |              /    |     |  \\            | o\r\n"
 "a   |             |    /       \\  \\           | a\r\n"
 "t   |          / /    |         |  \\           |t\r\n"
 "s   |         / /      \\__/\\___/    |          |s\r\n"
@@ -377,7 +367,6 @@ void big()
 void high()
 {
     system("/bin/ls -al /tmp/boobs | /bin/grep nipple | /bin/grep high");
-    strcpy((char *) info, line());
 }
 
 struct {
@@ -393,7 +382,7 @@ struct {
     {"D Cups", "{ O }{ O }", &d_cups},
     {"Wonder Bra Breasts", "(oYo)", &wonder},
     {"Cold Breasts", "( ^ )( ^ )", &cold},
-    {"Lopsided Breasts", "(o)(O)"},
+    {"Lopsided Breasts", "(o)(O)", &lopsided},
     {"Pierced Breasts", "(Q)(Q)"},
     {"Hanging Tassels Breasts", "(p)(p)"},
     {"Android Breasts", "|o||o|", &android},
@@ -405,7 +394,7 @@ void boobz0r()
     wonder_bra = strdup("SCADA Auxiliary Wonder Bra Company Name");
 
     info = (info_t *) malloc(sizeof(info_t));
-    info->callback = &lopsided;
+    info->callback = (int(*)(const char *)) &lopsided;
     strcpy(info->data, "Lopsided Breasts");
 
     xyz(
@@ -451,9 +440,6 @@ void boobz0r()
 
 int main()
 {
-    WSADATA a;
-    WSAStartup(MAKEWORD(2, 2), &a);
-
     int s = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in service;
